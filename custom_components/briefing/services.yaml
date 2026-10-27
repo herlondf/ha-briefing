@@ -1,0 +1,10 @@
+gerar:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: briefing
+    falar:
+      default: false
+      selector:
+        boolean:

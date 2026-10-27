@@ -1,0 +1,109 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Briefing",
+        "data": {
+          "ai_task": "AI task that writes the text",
+          "nome": "Name for the greeting",
+          "alto_falantes": "Speakers",
+          "tts": "TTS voice",
+          "horario": "Time",
+          "dias": "Weekdays",
+          "agendas": "Calendars",
+          "clima": "Weather",
+          "temas": "News topics",
+          "manchetes_por_tema": "Headlines per topic",
+          "fatos": "Home facts (template)",
+          "tamanho": "Length",
+          "instrucoes_extras": "Extra instructions"
+        },
+        "data_description": {
+          "alto_falantes": "Empty: only generate the text.",
+          "tts": "Empty: use Alexa announce (Alexa Media Player).",
+          "horario": "Empty: only on demand.",
+          "temas": "Comma separated.",
+          "fatos": "Jinja template.",
+          "instrucoes_extras": ""
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Briefing",
+        "data": {
+          "ai_task": "AI task that writes the text",
+          "nome": "Name for the greeting",
+          "alto_falantes": "Speakers",
+          "tts": "TTS voice",
+          "horario": "Time",
+          "dias": "Weekdays",
+          "agendas": "Calendars",
+          "clima": "Weather",
+          "temas": "News topics",
+          "manchetes_por_tema": "Headlines per topic",
+          "fatos": "Home facts (template)",
+          "tamanho": "Length",
+          "instrucoes_extras": "Extra instructions"
+        },
+        "data_description": {
+          "alto_falantes": "Empty: only generate the text.",
+          "tts": "Empty: use Alexa announce (Alexa Media Player).",
+          "horario": "Empty: only on demand.",
+          "temas": "Comma separated.",
+          "fatos": "Jinja template.",
+          "instrucoes_extras": ""
+        }
+      }
+    }
+  },
+  "selector": {
+    "dias": {
+      "options": {
+        "seg": "Monday",
+        "ter": "Tuesday",
+        "qua": "Wednesday",
+        "qui": "Thursday",
+        "sex": "Friday",
+        "sab": "Saturday",
+        "dom": "Sunday"
+      }
+    },
+    "tamanho": {
+      "options": {
+        "curto": "Short",
+        "medio": "Medium"
+      }
+    }
+  },
+  "entity": {
+    "button": {
+      "falar_agora": {
+        "name": "Speak now"
+      }
+    },
+    "sensor": {
+      "ultimo": {
+        "name": "Last briefing"
+      }
+    }
+  },
+  "services": {
+    "gerar": {
+      "name": "Generate briefing",
+      "description": "Builds the briefing now and returns the text.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Briefing",
+          "description": "Which briefing. Empty: the first one."
+        },
+        "falar": {
+          "name": "Speak",
+          "description": "Also speak it on the configured speakers."
+        }
+      }
+    }
+  }
+}

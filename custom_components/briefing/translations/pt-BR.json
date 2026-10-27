@@ -1,0 +1,109 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Briefing",
+        "data": {
+          "ai_task": "IA que escreve o texto",
+          "nome": "Nome para a saudação",
+          "alto_falantes": "Onde falar",
+          "tts": "Voz (TTS)",
+          "horario": "Horário",
+          "dias": "Dias da semana",
+          "agendas": "Agendas",
+          "clima": "Previsão do tempo",
+          "temas": "Temas de notícias",
+          "manchetes_por_tema": "Manchetes por tema",
+          "fatos": "Fatos da casa (template)",
+          "tamanho": "Tamanho",
+          "instrucoes_extras": "Pedido extra para a IA"
+        },
+        "data_description": {
+          "alto_falantes": "Echo ou outro alto-falante. Vazio: só gera o texto.",
+          "tts": "Deixe vazio para usar o anúncio da Alexa (Alexa Media Player).",
+          "horario": "Vazio: só fala quando pedir (botão ou serviço briefing.gerar).",
+          "temas": "Separados por vírgula. Ex.: tecnologia, atualidades, política, economia, esportes, Flamengo.",
+          "fatos": "Frases sobre a casa que a IA pode citar. Ex.: {{ states('sensor.resumo_casa') }} luzes acesas.",
+          "instrucoes_extras": "Ex.: fale como uma assistente animada; não fale de futebol."
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Briefing",
+        "data": {
+          "ai_task": "IA que escreve o texto",
+          "nome": "Nome para a saudação",
+          "alto_falantes": "Onde falar",
+          "tts": "Voz (TTS)",
+          "horario": "Horário",
+          "dias": "Dias da semana",
+          "agendas": "Agendas",
+          "clima": "Previsão do tempo",
+          "temas": "Temas de notícias",
+          "manchetes_por_tema": "Manchetes por tema",
+          "fatos": "Fatos da casa (template)",
+          "tamanho": "Tamanho",
+          "instrucoes_extras": "Pedido extra para a IA"
+        },
+        "data_description": {
+          "alto_falantes": "Echo ou outro alto-falante. Vazio: só gera o texto.",
+          "tts": "Deixe vazio para usar o anúncio da Alexa (Alexa Media Player).",
+          "horario": "Vazio: só fala quando pedir (botão ou serviço briefing.gerar).",
+          "temas": "Separados por vírgula. Ex.: tecnologia, atualidades, política, economia, esportes, Flamengo.",
+          "fatos": "Frases sobre a casa que a IA pode citar. Ex.: {{ states('sensor.resumo_casa') }} luzes acesas.",
+          "instrucoes_extras": "Ex.: fale como uma assistente animada; não fale de futebol."
+        }
+      }
+    }
+  },
+  "selector": {
+    "dias": {
+      "options": {
+        "seg": "Segunda",
+        "ter": "Terça",
+        "qua": "Quarta",
+        "qui": "Quinta",
+        "sex": "Sexta",
+        "sab": "Sábado",
+        "dom": "Domingo"
+      }
+    },
+    "tamanho": {
+      "options": {
+        "curto": "Curto",
+        "medio": "Médio"
+      }
+    }
+  },
+  "entity": {
+    "button": {
+      "falar_agora": {
+        "name": "Falar agora"
+      }
+    },
+    "sensor": {
+      "ultimo": {
+        "name": "Último briefing"
+      }
+    }
+  },
+  "services": {
+    "gerar": {
+      "name": "Gerar briefing",
+      "description": "Monta o briefing agora e devolve o texto.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Briefing",
+          "description": "Qual briefing. Vazio: o primeiro."
+        },
+        "falar": {
+          "name": "Falar",
+          "description": "Também fala nos alto-falantes configurados."
+        }
+      }
+    }
+  }
+}
