@@ -2,61 +2,106 @@
   "config": {
     "step": {
       "user": {
-        "title": "Briefing",
+        "title": "Geral",
         "data": {
           "ai_task": "IA que escreve o texto",
           "nome": "Nome para a saudação",
           "alto_falantes": "Onde falar",
           "tts": "Voz (TTS)",
           "horario": "Horário",
-          "dias": "Dias da semana",
+          "dias": "Dias da semana"
+        },
+        "data_description": {
+          "nome": "Disponível nas instruções como a variável nome.",
+          "alto_falantes": "Echo ou outro alto-falante. Vazio: só gera o texto.",
+          "tts": "Vazio: usa o anúncio da Alexa (Alexa Media Player).",
+          "horario": "Vazio: só fala quando pedir (botão ou ação briefing.gerar)."
+        }
+      },
+      "fontes": {
+        "title": "Fontes",
+        "data": {
           "agendas": "Agendas",
           "clima": "Previsão do tempo",
           "temas": "Temas de notícias",
           "manchetes_por_tema": "Manchetes por tema",
-          "fatos": "Fatos da casa (template)",
-          "tamanho": "Tamanho",
-          "instrucoes_extras": "Pedido extra para a IA"
+          "fatos": "Fatos da casa (template)"
         },
         "data_description": {
-          "alto_falantes": "Echo ou outro alto-falante. Vazio: só gera o texto.",
-          "tts": "Deixe vazio para usar o anúncio da Alexa (Alexa Media Player).",
-          "horario": "Vazio: só fala quando pedir (botão ou serviço briefing.gerar).",
-          "temas": "Separados por vírgula. Ex.: tecnologia, atualidades, política, economia, esportes, Flamengo.",
-          "fatos": "Frases sobre a casa que a IA pode citar. Ex.: {{ states('sensor.resumo_casa') }} luzes acesas.",
-          "instrucoes_extras": "Ex.: fale como uma assistente animada; não fale de futebol."
+          "temas": "Escolha da lista ou digite qualquer tema e tecle Enter. Atualidades são as manchetes; tecnologia, economia, esportes, saúde, ciência, entretenimento, mundo e brasil são seções do Google Notícias; outro texto vira busca das últimas 24 h.",
+          "fatos": "Template Jinja com frases sobre a casa que a IA pode citar, usando states() e state_attr() dos seus sensores."
         }
       }
+    },
+    "error": {
+      "template_invalido": "Template com erro. Confira a sintaxe Jinja."
     }
   },
   "options": {
     "step": {
       "init": {
         "title": "Briefing",
+        "description": "{resumo}",
+        "menu_options": {
+          "geral": "Geral: IA, nome, alto-falantes, voz e horário",
+          "fontes": "Fontes: agendas, clima, notícias e casa",
+          "instrucoes": "Instruções para a IA",
+          "previa": "Prévia: ver o que a IA recebe e testar"
+        }
+      },
+      "geral": {
+        "title": "Geral",
         "data": {
           "ai_task": "IA que escreve o texto",
           "nome": "Nome para a saudação",
           "alto_falantes": "Onde falar",
           "tts": "Voz (TTS)",
           "horario": "Horário",
-          "dias": "Dias da semana",
+          "dias": "Dias da semana"
+        },
+        "data_description": {
+          "nome": "Disponível nas instruções como a variável nome.",
+          "alto_falantes": "Echo ou outro alto-falante. Vazio: só gera o texto.",
+          "tts": "Vazio: usa o anúncio da Alexa (Alexa Media Player).",
+          "horario": "Vazio: só fala quando pedir (botão ou ação briefing.gerar)."
+        }
+      },
+      "fontes": {
+        "title": "Fontes",
+        "data": {
           "agendas": "Agendas",
           "clima": "Previsão do tempo",
           "temas": "Temas de notícias",
           "manchetes_por_tema": "Manchetes por tema",
-          "fatos": "Fatos da casa (template)",
-          "tamanho": "Tamanho",
-          "instrucoes_extras": "Pedido extra para a IA"
+          "fatos": "Fatos da casa (template)"
         },
         "data_description": {
-          "alto_falantes": "Echo ou outro alto-falante. Vazio: só gera o texto.",
-          "tts": "Deixe vazio para usar o anúncio da Alexa (Alexa Media Player).",
-          "horario": "Vazio: só fala quando pedir (botão ou serviço briefing.gerar).",
-          "temas": "Separados por vírgula. Ex.: tecnologia, atualidades, política, economia, esportes, Flamengo.",
-          "fatos": "Frases sobre a casa que a IA pode citar. Ex.: {{ states('sensor.resumo_casa') }} luzes acesas.",
-          "instrucoes_extras": "Ex.: fale como uma assistente animada; não fale de futebol."
+          "temas": "Escolha da lista ou digite qualquer tema e tecle Enter. Atualidades são as manchetes; tecnologia, economia, esportes, saúde, ciência, entretenimento, mundo e brasil são seções do Google Notícias; outro texto vira busca das últimas 24 h.",
+          "fatos": "Template Jinja com frases sobre a casa que a IA pode citar, usando states() e state_attr() dos seus sensores."
         }
+      },
+      "instrucoes": {
+        "title": "Instruções para a IA",
+        "description": "Este é o texto que a IA segue. Mude tom, tamanho, ordem dos assuntos e o que evitar. Para ver o resultado, use a Prévia.",
+        "data": {
+          "instrucoes": "Instruções"
+        },
+        "data_description": {
+          "instrucoes": "Template Jinja. Use a variável nome e funções como now(). Os dados (agenda, clima, casa, notícias) entram sempre no fim, depois de Dados. Apague tudo e salve para voltar ao padrão."
+        }
+      },
+      "previa": {
+        "title": "Prévia",
+        "description": "Pedido exato que vai para a IA agora:\n\n{instrucoes}\n\nEnviar gera o texto com a IA, sem falar nos alto-falantes."
       }
+    },
+    "error": {
+      "template_invalido": "Template com erro. Confira a sintaxe Jinja."
+    },
+    "abort": {
+      "resultado": "Texto gerado:\n\n{texto}",
+      "falha_ia": "A IA não respondeu: {erro}",
+      "template_com_erro": "Template com erro: {erro}"
     }
   },
   "selector": {
@@ -69,12 +114,6 @@
         "sex": "Sexta",
         "sab": "Sábado",
         "dom": "Domingo"
-      }
-    },
-    "tamanho": {
-      "options": {
-        "curto": "Curto",
-        "medio": "Médio"
       }
     }
   },

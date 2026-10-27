@@ -32,12 +32,13 @@ class Ultimo(SensorEntity, RestoreEntity):
         if antes and antes.state not in ("unknown", "unavailable"):
             self._attr_native_value = dt_util.parse_datetime(antes.state)
             self._attr_extra_state_attributes = {"texto": antes.attributes.get("texto", ""),
-                                                 "dados": antes.attributes.get("dados", [])}
+                                                 "dados": antes.attributes.get("dados", []),
+                                                 "instrucoes": antes.attributes.get("instrucoes", "")}
         self.async_on_remove(async_dispatcher_connect(self.hass, SINAL_NOVO.format(self._entry.entry_id), self._novo))
 
     @callback
     def _novo(self) -> None:
         r = self.hass.data[DOMAIN][self._entry.entry_id]
         self._attr_native_value = dt_util.parse_datetime(r["quando"])
-        self._attr_extra_state_attributes = {"texto": r["texto"], "dados": r["dados"]}
+        self._attr_extra_state_attributes = {"texto": r["texto"], "dados": r["dados"], "instrucoes": r["instrucoes"]}
         self.async_write_ha_state()

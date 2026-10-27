@@ -15,25 +15,24 @@ Depois: Configurações → Dispositivos e serviços → Adicionar integração 
 
 Sem HACS: copie `custom_components/briefing` para `/config/custom_components/` e reinicie.
 
-## Opções
-| Campo | O que faz |
+## Configurar
+Configurações → Dispositivos e serviços → Briefing → **Configurar** abre um menu com o resumo do que está ligado
+(IA, alto-falantes, horário, agendas, clima, notícias, casa, instruções) e quatro telas:
+
+| Tela | O que tem |
 |---|---|
-| IA que escreve o texto | entidade `ai_task` |
-| Nome para a saudação | "Bom dia, Fulano" |
-| Onde falar | um ou mais `media_player`. Vazio: só gera o texto |
-| Voz (TTS) | vazio: usa o anúncio da Alexa |
-| Horário e dias | quando fala sozinho. Sem horário: só quando pedir |
-| Agendas | `calendar` do dia |
-| Previsão do tempo | `weather` |
-| Temas de notícias | separados por vírgula. `atualidades` são as manchetes. `tecnologia`, `economia`, `esportes`, `saúde`, `ciência`, `mundo` e `brasil` usam as seções do Google Notícias. Qualquer outro tema vira busca das últimas 24 h |
-| Manchetes por tema | de 1 a 5 |
-| Fatos da casa | template Jinja com o que a IA pode citar |
-| Tamanho | curto (até 5 frases) ou médio (até 9) |
-| Pedido extra para a IA | tom, assuntos para evitar etc. |
+| Geral | IA (`ai_task`), nome da saudação, alto-falantes (`media_player`), voz (`tts`; vazio usa o anúncio da Alexa), horário e dias. Sem horário: só fala quando pedir |
+| Fontes | agendas (`calendar`), previsão (`weather`), temas de notícias, manchetes por tema (1 a 5) e fatos da casa (template Jinja) |
+| Instruções para a IA | o texto que a IA segue, em Jinja, já preenchido com o padrão. Mude tom, tamanho, ordem, o que evitar. Variável `nome`; funções do HA como `now()`. Os dados entram sempre no fim. Apague e salve para voltar ao padrão |
+| Prévia | mostra o pedido exato que vai para a IA, com as notícias e dados de agora. Enviar gera o texto sem falar |
+
+Temas de notícias: escolha da lista ou digite qualquer tema. `atualidades` são as manchetes; `tecnologia`, `economia`,
+`esportes`, `saúde`, `ciência`, `entretenimento`, `mundo` e `brasil` usam as seções do Google Notícias; qualquer outro
+texto vira busca das últimas 24 h.
 
 Cada briefing configurado cria:
 - `button.<nome>_falar_agora`;
-- `sensor.<nome>_ultimo_briefing`: o estado é o horário; os atributos `texto` e `dados` guardam o que foi falado e o que a IA recebeu.
+- `sensor.<nome>_ultimo_briefing`: o estado é o horário; os atributos `texto`, `dados` e `instrucoes` guardam o que foi falado, os dados coletados e o pedido exato enviado à IA.
 
 Dá para ter vários: um de manhã no escritório e outro à noite no quarto, por exemplo.
 
@@ -43,7 +42,7 @@ action: briefing.gerar
 data:
   falar: true          # opcional
   config_entry_id: ... # opcional; vazio usa o primeiro
-response_variable: r   # r.texto
+response_variable: r   # r.texto, r.dados, r.instrucoes
 ```
 
 ## Limites

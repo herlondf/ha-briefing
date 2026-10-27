@@ -12,8 +12,8 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.template import Template
 from homeassistant.util import dt as dt_util
 
-from .const import (CONF_AGENDAS, CONF_AI_TASK, CONF_ALTO_FALANTES, CONF_CLIMA, CONF_EXTRA, CONF_FATOS,
-                    CONF_MANCHETES, CONF_NOME, CONF_TAMANHO, CONF_TEMAS, CONF_TTS, TAMANHOS)
+from .const import (CONF_AGENDAS, CONF_AI_TASK, CONF_ALTO_FALANTES, CONF_CLIMA, CONF_FATOS, CONF_INSTRUCOES,
+                    CONF_MANCHETES, CONF_NOME, CONF_TEMAS, CONF_TTS, INSTRUCOES_PADRAO)
 
 _LOG = logging.getLogger(__name__)
 
@@ -25,6 +25,20 @@ SECOES = {"tecnologia": "TECHNOLOGY", "ciência": "SCIENCE", "ciencia": "SCIENCE
           "saude": "HEALTH", "entretenimento": "ENTERTAINMENT", "mundo": "WORLD", "internacional": "WORLD",
           "brasil": "NATION"}
 GERAL = {"atualidades", "manchetes", "principais", "geral", "destaques"}
+# Opções da tela (com acento); qualquer outro texto digitado vira busca.
+TEMAS_PRONTOS = ["atualidades", "tecnologia", "economia", "esportes", "saúde", "ciência", "entretenimento", "mundo",
+                 "brasil"]
+
+
+def lista_temas(o: dict) -> list[str]:
+    """Temas como lista. Versão antiga guardava texto separado por vírgula."""
+    t = o.get(CONF_TEMAS) or []
+    return [x.strip() for x in (t.split(",") if isinstance(t, str) else t) if x.strip()]
+
+
+def tipo_do_tema(tema: str) -> str:
+    t = tema.strip().lower()
+    return "manchetes" if t in GERAL else "seção" if t in SECOES else "busca 24 h"
 
 
 def url_do_tema(tema: str) -> str:
@@ -111,36 +125,28 @@ async def montar_dados(hass: HomeAssistant, o: dict) -> list[str]:
             blocos.append("Casa: " + str(Template(o[CONF_FATOS], hass).async_render(parse_result=False)).strip())
         except Exception as err:  # noqa: BLE001
             _LOG.warning("Template de fatos com erro: %s", err)
-    temas = [t.strip() for t in (o.get(CONF_TEMAS) or "").split(",") if t.strip()]
+    temas = lista_temas(o)
     if temas:
         blocos += await _noticias(hass, temas, int(o.get(CONF_MANCHETES, 2)))
     return blocos
 
 
-def instrucoes(o: dict, blocos: list[str]) -> str:
-    agora = dt_util.now()
-    saudacao = "Bom dia" if agora.hour < 12 else "Boa tarde" if agora.hour < 18 else "Boa noite"
-    nome = (o.get(CONF_NOME) or "").strip()
-    return (
-        f"Escreva um briefing para ser FALADO por um alto-falante inteligente, em português do Brasil. "
-        f"Comece com '{saudacao}{', ' + nome if nome else ''}'. Hoje é {agora.strftime('%d/%m/%Y')}, {agora.strftime('%H:%M')}. "
-        f"Texto corrido, {TAMANHOS.get(o.get(CONF_TAMANHO), TAMANHOS['curto'])}, sem listas, sem emoji, sem abreviação e sem "
-        "markdown, porque tudo será lido em voz alta. Ordem: compromissos (hora dita de forma natural), tempo, casa, "
-        "notícias. Frases de até 20 palavras. Nas notícias, escolha só as mais relevantes, uma frase curta para cada, sem opinião e sem citar o jornal. Junte notícias "
-        "repetidas. Fale do tempo em uma frase e só cite chuva se a chance for alta. Se não houver compromisso, diga isso "
-        "em poucas palavras. Não invente nada que não esteja nos dados.\n"
-        + (f"Pedido do morador: {o[CONF_EXTRA]}\n" if o.get(CONF_EXTRA) else "")
-        + "Dados:\n" + "\n".join(blocos)
-    )
+def instrucoes(hass: HomeAssistant, o: dict, blocos: list[str]) -> str:
+    """Template do usuário (ou o padrão) renderizado, com os dados no fim."""
+    tpl = o.get(CONF_INSTRUCOES) or INSTRUCOES_PADRAO
+    texto = Template(tpl, hass).async_render({"nome": (o.get(CONF_NOME) or "").strip()}, parse_result=False)
+    return str(texto).strip() + "\nDados:\n" + ("\n".join(blocos) or "nenhum")
 
 
 async def gerar(hass: HomeAssistant, o: dict) -> dict:
     blocos = await montar_dados(hass, o)
+    prompt = instrucoes(hass, o, blocos)
     resp = await hass.services.async_call(
         "ai_task", "generate_data",
-        {"entity_id": o[CONF_AI_TASK], "task_name": "briefing", "instructions": instrucoes(o, blocos)},
+        {"entity_id": o[CONF_AI_TASK], "task_name": "briefing", "instructions": prompt},
         blocking=True, return_response=True)
-    return {"texto": str((resp or {}).get("data", "")).strip(), "dados": blocos, "quando": dt_util.now().isoformat()}
+    return {"texto": str((resp or {}).get("data", "")).strip(), "dados": blocos, "instrucoes": prompt,
+            "quando": dt_util.now().isoformat()}
 
 
 async def falar(hass: HomeAssistant, o: dict, texto: str) -> None:

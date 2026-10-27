@@ -45,7 +45,7 @@ async def async_setup(hass: HomeAssistant, config) -> bool:
         if entry is None:
             raise HomeAssistantError("Nenhum briefing configurado com esse id")
         r = await executar(hass, entry, call.data.get("falar", False))
-        return {"texto": r["texto"], "dados": r["dados"]}
+        return {"texto": r["texto"], "dados": r["dados"], "instrucoes": r["instrucoes"]}
 
     hass.services.async_register(
         DOMAIN, "gerar", servico,

@@ -2,61 +2,106 @@
   "config": {
     "step": {
       "user": {
-        "title": "Briefing",
+        "title": "General",
         "data": {
           "ai_task": "AI task that writes the text",
           "nome": "Name for the greeting",
           "alto_falantes": "Speakers",
           "tts": "TTS voice",
           "horario": "Time",
-          "dias": "Weekdays",
+          "dias": "Weekdays"
+        },
+        "data_description": {
+          "nome": "Available in the instructions as the variable nome.",
+          "alto_falantes": "Echo or another speaker. Empty: only generates the text.",
+          "tts": "Empty: uses Alexa announce (Alexa Media Player).",
+          "horario": "Empty: only speaks on demand (button or briefing.gerar action)."
+        }
+      },
+      "fontes": {
+        "title": "Sources",
+        "data": {
           "agendas": "Calendars",
           "clima": "Weather",
           "temas": "News topics",
           "manchetes_por_tema": "Headlines per topic",
-          "fatos": "Home facts (template)",
-          "tamanho": "Length",
-          "instrucoes_extras": "Extra instructions"
+          "fatos": "Home facts (template)"
         },
         "data_description": {
-          "alto_falantes": "Empty: only generate the text.",
-          "tts": "Empty: use Alexa announce (Alexa Media Player).",
-          "horario": "Empty: only on demand.",
-          "temas": "Comma separated.",
-          "fatos": "Jinja template.",
-          "instrucoes_extras": ""
+          "temas": "Pick from the list or type any topic and press Enter. Known topics use Google News sections; any other text becomes a last 24 h search.",
+          "fatos": "Jinja template with sentences about the home the AI may mention, using states() and state_attr()."
         }
       }
+    },
+    "error": {
+      "template_invalido": "Template error. Check the Jinja syntax."
     }
   },
   "options": {
     "step": {
       "init": {
         "title": "Briefing",
+        "description": "{resumo}",
+        "menu_options": {
+          "geral": "General: AI, name, speakers, voice and time",
+          "fontes": "Sources: calendars, weather, news and home",
+          "instrucoes": "AI instructions",
+          "previa": "Preview: see what the AI receives and test it"
+        }
+      },
+      "geral": {
+        "title": "General",
         "data": {
           "ai_task": "AI task that writes the text",
           "nome": "Name for the greeting",
           "alto_falantes": "Speakers",
           "tts": "TTS voice",
           "horario": "Time",
-          "dias": "Weekdays",
+          "dias": "Weekdays"
+        },
+        "data_description": {
+          "nome": "Available in the instructions as the variable nome.",
+          "alto_falantes": "Echo or another speaker. Empty: only generates the text.",
+          "tts": "Empty: uses Alexa announce (Alexa Media Player).",
+          "horario": "Empty: only speaks on demand (button or briefing.gerar action)."
+        }
+      },
+      "fontes": {
+        "title": "Sources",
+        "data": {
           "agendas": "Calendars",
           "clima": "Weather",
           "temas": "News topics",
           "manchetes_por_tema": "Headlines per topic",
-          "fatos": "Home facts (template)",
-          "tamanho": "Length",
-          "instrucoes_extras": "Extra instructions"
+          "fatos": "Home facts (template)"
         },
         "data_description": {
-          "alto_falantes": "Empty: only generate the text.",
-          "tts": "Empty: use Alexa announce (Alexa Media Player).",
-          "horario": "Empty: only on demand.",
-          "temas": "Comma separated.",
-          "fatos": "Jinja template.",
-          "instrucoes_extras": ""
+          "temas": "Pick from the list or type any topic and press Enter. Known topics use Google News sections; any other text becomes a last 24 h search.",
+          "fatos": "Jinja template with sentences about the home the AI may mention, using states() and state_attr()."
         }
+      },
+      "instrucoes": {
+        "title": "AI instructions",
+        "description": "This is the text the AI follows. Change tone, length, topic order and what to avoid. Use Preview to see the result.",
+        "data": {
+          "instrucoes": "Instructions"
+        },
+        "data_description": {
+          "instrucoes": "Jinja template. Use the variable nome and functions like now(). The data (calendar, weather, home, news) is always appended at the end, after Dados. Clear it and save to go back to the default."
+        }
+      },
+      "previa": {
+        "title": "Preview",
+        "description": "Exact request sent to the AI now:\n\n{instrucoes}\n\nSubmit generates the text with the AI, without speaking."
       }
+    },
+    "error": {
+      "template_invalido": "Template error. Check the Jinja syntax."
+    },
+    "abort": {
+      "resultado": "Generated text:\n\n{texto}",
+      "falha_ia": "The AI did not answer: {erro}",
+      "template_com_erro": "Template error: {erro}"
     }
   },
   "selector": {
@@ -69,12 +114,6 @@
         "sex": "Friday",
         "sab": "Saturday",
         "dom": "Sunday"
-      }
-    },
-    "tamanho": {
-      "options": {
-        "curto": "Short",
-        "medio": "Medium"
       }
     }
   },
@@ -101,7 +140,7 @@
         },
         "falar": {
           "name": "Speak",
-          "description": "Also speak it on the configured speakers."
+          "description": "Also speak on the configured speakers."
         }
       }
     }
