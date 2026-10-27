@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "General",
+        "title": "IA Briefing",
         "data": {
           "ai_task": "AI task that writes the text",
           "nome": "Name for the greeting",
@@ -40,7 +40,7 @@
   "options": {
     "step": {
       "init": {
-        "title": "Briefing",
+        "title": "IA Briefing",
         "description": "{resumo}",
         "menu_options": {
           "geral": "General: AI, name, speakers, voice and time",
@@ -126,6 +126,11 @@
     "sensor": {
       "ultimo": {
         "name": "Last briefing"
+      }
+    },
+    "switch": {
+      "automatico": {
+        "name": "Speak on schedule"
       }
     }
   },

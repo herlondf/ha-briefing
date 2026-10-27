@@ -38,7 +38,7 @@ class Ultimo(SensorEntity, RestoreEntity):
 
     @callback
     def _novo(self) -> None:
-        r = self.hass.data[DOMAIN][self._entry.entry_id]
+        r = self.hass.data[DOMAIN][self._entry.entry_id]["ultimo"]
         self._attr_native_value = dt_util.parse_datetime(r["quando"])
         self._attr_extra_state_attributes = {"texto": r["texto"], "dados": r["dados"], "instrucoes": r["instrucoes"]}
         self.async_write_ha_state()

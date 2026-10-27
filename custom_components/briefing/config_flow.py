@@ -120,7 +120,7 @@ class BriefingConfigFlow(ConfigFlow, domain=DOMAIN):
         erros = erros_template(self.hass, user_input) if user_input is not None else {}
         if user_input is not None and not erros:
             o = self._o | user_input
-            return self.async_create_entry(title=f"Briefing {o.get(CONF_NOME, '')}".strip(), data={}, options=o)
+            return self.async_create_entry(title=f"IA Briefing {o.get(CONF_NOME, '')}".strip(), data={}, options=o)
         return self.async_show_form(step_id="fontes", data_schema=form_fontes(user_input or {}), errors=erros)
 
     @staticmethod

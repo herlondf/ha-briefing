@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Geral",
+        "title": "IA Briefing",
         "data": {
           "ai_task": "IA que escreve o texto",
           "nome": "Nome para a saudação",
@@ -40,7 +40,7 @@
   "options": {
     "step": {
       "init": {
-        "title": "Briefing",
+        "title": "IA Briefing",
         "description": "{resumo}",
         "menu_options": {
           "geral": "Geral: IA, nome, alto-falantes, voz e horário",
@@ -126,6 +126,11 @@
     "sensor": {
       "ultimo": {
         "name": "Último briefing"
+      }
+    },
+    "switch": {
+      "automatico": {
+        "name": "Falar no horário"
       }
     }
   },
