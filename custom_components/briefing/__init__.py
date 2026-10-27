@@ -10,6 +10,7 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, ServiceCall, ServiceResponse, SupportsResponse
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_change
 from homeassistant.util import dt as dt_util
@@ -20,6 +21,12 @@ from .const import CONF_DIAS, CONF_HORARIO, DIAS, DOMAIN, SINAL_NOVO
 _LOG = logging.getLogger(__name__)
 PLATFORMS = [Platform.BUTTON, Platform.SENSOR]
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
+
+def dispositivo(entry: ConfigEntry) -> DeviceInfo:
+    """Dispositivo do briefing, com link para a tela de configuração."""
+    return DeviceInfo(identifiers={(DOMAIN, entry.entry_id)}, name=entry.title, entry_type=DeviceEntryType.SERVICE,
+                      configuration_url=f"homeassistant://config/integrations/integration/{DOMAIN}?config_entry={entry.entry_id}")
 
 
 async def executar(hass: HomeAssistant, entry: ConfigEntry, fala: bool) -> dict:
