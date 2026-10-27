@@ -5,17 +5,30 @@
         "title": "IA Briefing",
         "data": {
           "ai_task": "IA que escreve o texto",
-          "nome": "Nome para a saudação",
-          "alto_falantes": "Onde falar",
-          "tts": "Voz (TTS)",
-          "horario": "Horário",
-          "dias": "Dias da semana"
+          "nome": "Nome para a saudação"
         },
         "data_description": {
-          "nome": "Disponível nas instruções como a variável nome.",
+          "nome": "Disponível nas instruções como a variável nome."
+        }
+      },
+      "fala": {
+        "title": "Fala e horário",
+        "data": {
+          "alto_falantes": "Onde falar",
+          "tts": "Voz (TTS)",
+          "volume": "Volume",
+          "horario": "Horários",
+          "dias": "Dias da semana",
+          "so_falar_se": "Só falar se (template)",
+          "notificar": "Senão, mandar para"
+        },
+        "data_description": {
           "alto_falantes": "Echo ou outro alto-falante. Vazio: só gera o texto.",
           "tts": "Vazio: usa o anúncio da Alexa (Alexa Media Player).",
-          "horario": "Vazio: só fala quando pedir (botão ou ação briefing.gerar)."
+          "volume": "Ajusta antes de falar e volta ao volume anterior depois. Vazio: não mexe.",
+          "horario": "Escolha ou digite (ex.: 19:30) e tecle Enter. Vazio: só fala quando pedir (botão ou ação briefing.gerar).",
+          "so_falar_se": "Vale para os horários. Ex. para alguém em casa: {exemplo}  Vazio: sempre fala.",
+          "notificar": "Celulares (notify) que recebem o texto quando a condição acima for falsa. Vazio: não faz nada."
         }
       },
       "fontes": {
@@ -34,7 +47,8 @@
       }
     },
     "error": {
-      "template_invalido": "Template com erro. Confira a sintaxe Jinja."
+      "template_invalido": "Template com erro. Confira a sintaxe Jinja.",
+      "horario_invalido": "Horário inválido. Use HH:MM, por exemplo 07:30."
     }
   },
   "options": {
@@ -43,7 +57,8 @@
         "title": "IA Briefing",
         "description": "{resumo}",
         "menu_options": {
-          "geral": "Geral: IA, nome, alto-falantes, voz e horário",
+          "geral": "Geral: IA e nome",
+          "fala": "Fala e horário: alto-falantes, voz, volume, horários e condição",
           "fontes": "Fontes: agendas, clima, notícias e casa",
           "instrucoes": "Instruções para a IA",
           "previa": "Prévia: ver o que a IA recebe e testar"
@@ -53,17 +68,30 @@
         "title": "Geral",
         "data": {
           "ai_task": "IA que escreve o texto",
-          "nome": "Nome para a saudação",
-          "alto_falantes": "Onde falar",
-          "tts": "Voz (TTS)",
-          "horario": "Horário",
-          "dias": "Dias da semana"
+          "nome": "Nome para a saudação"
         },
         "data_description": {
-          "nome": "Disponível nas instruções como a variável nome.",
+          "nome": "Disponível nas instruções como a variável nome."
+        }
+      },
+      "fala": {
+        "title": "Fala e horário",
+        "data": {
+          "alto_falantes": "Onde falar",
+          "tts": "Voz (TTS)",
+          "volume": "Volume",
+          "horario": "Horários",
+          "dias": "Dias da semana",
+          "so_falar_se": "Só falar se (template)",
+          "notificar": "Senão, mandar para"
+        },
+        "data_description": {
           "alto_falantes": "Echo ou outro alto-falante. Vazio: só gera o texto.",
           "tts": "Vazio: usa o anúncio da Alexa (Alexa Media Player).",
-          "horario": "Vazio: só fala quando pedir (botão ou ação briefing.gerar)."
+          "volume": "Ajusta antes de falar e volta ao volume anterior depois. Vazio: não mexe.",
+          "horario": "Escolha ou digite (ex.: 19:30) e tecle Enter. Vazio: só fala quando pedir (botão ou ação briefing.gerar).",
+          "so_falar_se": "Vale para os horários. Ex. para alguém em casa: {exemplo}  Vazio: sempre fala.",
+          "notificar": "Celulares (notify) que recebem o texto quando a condição acima for falsa. Vazio: não faz nada."
         }
       },
       "fontes": {
@@ -96,7 +124,8 @@
       }
     },
     "error": {
-      "template_invalido": "Template com erro. Confira a sintaxe Jinja."
+      "template_invalido": "Template com erro. Confira a sintaxe Jinja.",
+      "horario_invalido": "Horário inválido. Use HH:MM, por exemplo 07:30."
     },
     "abort": {
       "resultado": "Texto gerado:\n\n{texto}",

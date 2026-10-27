@@ -7,11 +7,12 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from . import dispositivo
-from .const import CONF_HORARIO, DOMAIN
+from .briefing import lista_horarios
+from .const import DOMAIN
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, add) -> None:
-    if entry.options.get(CONF_HORARIO):  # sem horário não há automático para pausar
+    if lista_horarios(entry.options):  # sem horário não há automático para pausar
         add([Automatico(entry, hass.data[DOMAIN][entry.entry_id])])
 
 

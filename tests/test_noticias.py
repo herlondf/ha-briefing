@@ -15,7 +15,7 @@ sys.modules["homeassistant.util"].dt = None
 pacote = types.ModuleType("briefing")  # pula o __init__ (precisa do HA)
 pacote.__path__ = [str(Path(__file__).parents[1] / "custom_components" / "briefing")]
 sys.modules["briefing"] = pacote
-from briefing.briefing import lista_temas, manchetes, tipo_do_tema, url_do_tema  # noqa: E402
+from briefing.briefing import hora, lista_horarios, lista_temas, manchetes, tipo_do_tema, url_do_tema  # noqa: E402
 from briefing.const import INSTRUCOES_PADRAO  # noqa: E402
 
 XML = """<rss><channel>
@@ -35,6 +35,10 @@ assert "search?q=pol%C3%ADtica%20when%3A1d" in url_do_tema("política")
 assert lista_temas({"temas": "tecnologia, , Flamengo"}) == ["tecnologia", "Flamengo"]  # formato antigo
 assert lista_temas({"temas": ["saúde", " "]}) == ["saúde"]
 assert [tipo_do_tema(t) for t in ["Atualidades", "saúde", "Flamengo"]] == ["manchetes", "seção", "busca 24 h"]
+assert [hora(x) for x in ["8:00", "08h05", "19:30:00", "24:00", "7:5", "abc"]] == ["08:00", "08:05", "19:30", None, None, None]
+assert lista_horarios({"horario": "08:00:00"}) == ["08:00"]  # formato antigo (um só, texto)
+assert lista_horarios({"horario": ["19:30", "7:00", "07:00", "xx"]}) == ["07:00", "19:30"]
+assert lista_horarios({}) == []
 
 try:  # o template padrão precisa ser Jinja válido (HA usa jinja2)
     import jinja2

@@ -23,10 +23,14 @@ Configurações → Dispositivos e serviços → IA Briefing → engrenagem ⚙ 
 
 | Tela | O que tem |
 |---|---|
-| Geral | IA (`ai_task`), nome da saudação, alto-falantes (`media_player`), voz (`tts`; vazio usa o anúncio da Alexa), horário e dias. Sem horário: só fala quando pedir |
+| Geral | IA (`ai_task`) e nome da saudação |
+| Fala e horário | alto-falantes (`media_player`), voz (`tts`; vazio usa o anúncio da Alexa), volume (ajusta e depois volta ao anterior), um ou mais horários, dias, **Só falar se** (template) e **Senão, mandar para** (entidades `notify`, ex. o celular) |
 | Fontes | agendas (`calendar`), previsão (`weather`), temas de notícias, manchetes por tema (1 a 5) e fatos da casa (template Jinja) |
 | Instruções para a IA | o texto que a IA segue, em Jinja, já preenchido com o padrão. Mude tom, tamanho, ordem, o que evitar. Variável `nome`; funções do HA como `now()`. Os dados entram sempre no fim. Apague e salve para voltar ao padrão |
 | Prévia | mostra o pedido exato que vai para a IA, com as notícias e dados de agora. Enviar gera o texto sem falar |
+
+Só falar se: vale para os horários (o botão Falar agora sempre fala). Ex.: `{{ states('zone.home') | int > 0 }}` fala só
+com alguém em casa; se ninguém estiver, o texto vai como notificação para os celulares escolhidos.
 
 Temas de notícias: escolha da lista ou digite qualquer tema. `atualidades` são as manchetes; `tecnologia`, `economia`,
 `esportes`, `saúde`, `ciência`, `entretenimento`, `mundo` e `brasil` usam as seções do Google Notícias; qualquer outro
@@ -53,6 +57,7 @@ response_variable: r   # r.texto, r.dados, r.instrucoes
 
 ## Limites
 - Ícone próprio exige HA 2026.3 ou mais novo.
+- A volta do volume usa uma estimativa da duração da fala (a Alexa não avisa quando o anúncio acaba).
 - Notícias só do Google Notícias Brasil, em português.
 - Se um bloco falhar (feed fora do ar, agenda com erro), ele fica de fora e o resto sai normal. O aviso vai para o log.
 

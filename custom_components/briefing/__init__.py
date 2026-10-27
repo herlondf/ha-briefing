@@ -15,10 +15,11 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_change
+from homeassistant.helpers.template import Template, result_as_boolean
 from homeassistant.util import dt as dt_util
 
-from .briefing import falar, gerar
-from .const import CONF_DIAS, CONF_HORARIO, DIAS, DOMAIN, SINAL_NOVO
+from .briefing import falar, gerar, lista_horarios
+from .const import CONF_CONDICAO, CONF_DIAS, CONF_NOTIFICAR, DIAS, DOMAIN, SINAL_NOVO
 
 _LOG = logging.getLogger(__name__)
 PLATFORMS = [Platform.BUTTON, Platform.SENSOR, Platform.SWITCH]
@@ -66,25 +67,35 @@ async def async_setup(hass: HomeAssistant, config) -> bool:
     return True
 
 
+def pode_falar(hass: HomeAssistant, o: dict) -> bool:
+    """Condição "Só falar se" (template). Sem condição: sempre."""
+    return not o.get(CONF_CONDICAO) or result_as_boolean(Template(o[CONF_CONDICAO], hass).async_render())
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     estado = hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {"trava": asyncio.Lock(), "automatico": True}
-    horario = entry.options.get(CONF_HORARIO)
-    if horario:
-        h, m = (int(x) for x in horario.split(":")[:2])
-        aviso = f"{DOMAIN}_{entry.entry_id}_falha"
+    aviso = f"{DOMAIN}_{entry.entry_id}_falha"
 
-        async def na_hora(_now) -> None:
-            if not estado["automatico"] or DIAS[dt_util.now().weekday()] not in entry.options.get(CONF_DIAS, DIAS):
-                return
-            try:
+    async def na_hora(now) -> None:
+        o = entry.options
+        if not estado["automatico"] or DIAS[dt_util.as_local(now).weekday()] not in o.get(CONF_DIAS, DIAS):
+            return
+        try:
+            if pode_falar(hass, o):
                 await executar(hass, entry, True)
-                persistent_notification.async_dismiss(hass, aviso)
-            except Exception as err:  # noqa: BLE001 - horário falhou: avisa na tela e espera o próximo
-                _LOG.exception("Briefing %s falhou no horário", entry.title)
-                persistent_notification.async_create(
-                    hass, f"O briefing das {horario[:5]} não saiu: {err}\n\nTeste em Configurar → Prévia.",
-                    title=f"{entry.title} falhou", notification_id=aviso)
+            elif o.get(CONF_NOTIFICAR):  # ninguém para ouvir: manda o texto para o celular
+                r = await executar(hass, entry, False)
+                await hass.services.async_call("notify", "send_message", {
+                    "entity_id": o[CONF_NOTIFICAR], "title": entry.title, "message": r["texto"]}, blocking=True)
+            persistent_notification.async_dismiss(hass, aviso)
+        except Exception as err:  # noqa: BLE001 - horário falhou: avisa na tela e espera o próximo
+            _LOG.exception("Briefing %s falhou no horário", entry.title)
+            persistent_notification.async_create(
+                hass, f"O briefing das {dt_util.as_local(now):%H:%M} não saiu: {err}\n\nTeste em Configurar → Prévia.",
+                title=f"{entry.title} falhou", notification_id=aviso)
 
+    for hhmm in lista_horarios(entry.options):
+        h, m = map(int, hhmm.split(":"))
         entry.async_on_unload(async_track_time_change(hass, na_hora, hour=h, minute=m, second=0))
     entry.async_on_unload(entry.add_update_listener(_recarregar))
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)

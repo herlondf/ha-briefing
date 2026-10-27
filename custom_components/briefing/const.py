@@ -14,6 +14,9 @@ CONF_TEMAS = "temas"
 CONF_MANCHETES = "manchetes_por_tema"
 CONF_FATOS = "fatos"
 CONF_INSTRUCOES = "instrucoes"
+CONF_VOLUME = "volume"
+CONF_CONDICAO = "so_falar_se"
+CONF_NOTIFICAR = "notificar"
 
 DIAS = ["seg", "ter", "qua", "qui", "sex", "sab", "dom"]
 

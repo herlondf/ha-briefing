@@ -1,7 +1,9 @@
 """Monta e fala o briefing: agenda, clima, notícias e fatos da casa, resumidos pela IA do HA."""
 from __future__ import annotations
 
+import asyncio
 import logging
+import re
 import xml.etree.ElementTree as ET
 from datetime import timedelta
 from email.utils import parsedate_to_datetime
@@ -12,8 +14,8 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.template import Template
 from homeassistant.util import dt as dt_util
 
-from .const import (CONF_AGENDAS, CONF_AI_TASK, CONF_ALTO_FALANTES, CONF_CLIMA, CONF_FATOS, CONF_INSTRUCOES,
-                    CONF_MANCHETES, CONF_NOME, CONF_TEMAS, CONF_TTS, INSTRUCOES_PADRAO)
+from .const import (CONF_AGENDAS, CONF_AI_TASK, CONF_ALTO_FALANTES, CONF_CLIMA, CONF_FATOS, CONF_HORARIO,
+                    CONF_INSTRUCOES, CONF_MANCHETES, CONF_NOME, CONF_TEMAS, CONF_TTS, CONF_VOLUME, INSTRUCOES_PADRAO)
 
 _LOG = logging.getLogger(__name__)
 
@@ -34,6 +36,18 @@ def lista_temas(o: dict) -> list[str]:
     """Temas como lista. Versão antiga guardava texto separado por vírgula."""
     t = o.get(CONF_TEMAS) or []
     return [x.strip() for x in (t.split(",") if isinstance(t, str) else t) if x.strip()]
+
+
+def hora(x: str) -> str | None:
+    """'8:00', '08h00' ou '08:00:00' -> '08:00'; inválido -> None."""
+    m = re.fullmatch(r"\s*([01]?\d|2[0-3])[:h]([0-5]\d)(:[0-5]\d)?\s*", x)
+    return f"{int(m[1]):02d}:{m[2]}" if m else None
+
+
+def lista_horarios(o: dict) -> list[str]:
+    """Horários como lista 'HH:MM'. Versão antiga guardava um só, como texto."""
+    h = o.get(CONF_HORARIO) or []
+    return sorted({hora(x) for x in ([h] if isinstance(h, str) else h)} - {None})
 
 
 def tipo_do_tema(tema: str) -> str:
@@ -153,6 +167,14 @@ async def falar(hass: HomeAssistant, o: dict, texto: str) -> None:
     alvos = o.get(CONF_ALTO_FALANTES) or []
     if not alvos or not texto:
         return
+    antes = {}
+    if o.get(CONF_VOLUME) is not None:
+        antes = {e: st.attributes.get("volume_level") for e in alvos if (st := hass.states.get(e))}
+        try:
+            await hass.services.async_call("media_player", "volume_set",
+                                           {"entity_id": alvos, "volume_level": o[CONF_VOLUME] / 100}, blocking=True)
+        except Exception as err:  # noqa: BLE001 - sem volume ainda dá para falar
+            _LOG.warning("Não ajustou o volume: %s", err)
     if o.get(CONF_TTS):
         await hass.services.async_call("tts", "speak", {"entity_id": o[CONF_TTS], "media_player_entity_id": alvos,
                                                         "message": texto}, blocking=True)
@@ -161,3 +183,14 @@ async def falar(hass: HomeAssistant, o: dict, texto: str) -> None:
                                                                  "data": {"type": "announce"}}, blocking=True)
     else:
         _LOG.warning("Sem TTS configurado e sem Alexa Media: briefing não foi falado")
+    if antes:
+        hass.async_create_background_task(_restaurar_volume(hass, antes, texto), "briefing_volume")
+
+
+async def _restaurar_volume(hass: HomeAssistant, antes: dict, texto: str) -> None:
+    # ponytail: duração estimada (~2,5 palavras/s + folga), porque a Alexa não avisa quando o anúncio acaba.
+    await asyncio.sleep(len(texto.split()) / 2.5 + 8)
+    for e, v in antes.items():
+        if v is not None:
+            await hass.services.async_call("media_player", "volume_set", {"entity_id": e, "volume_level": v},
+                                           blocking=True)
